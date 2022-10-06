@@ -7,7 +7,7 @@ module.exports.getBootcamps = asyncErrorWrapper(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        result:bootcamps.length,
+        result: bootcamps.length,
         data: {
             bootcamps
         }
@@ -34,8 +34,37 @@ module.exports.createBootcamp = asyncErrorWrapper(async (req, res, next) => {
     res.status(201).json({ success: true, data: bootcamp });
 });
 
-module.exports.updateBootcamp = asyncErrorWrapper(async(req, res, next) => {});
+module.exports.updateBootcamp = asyncErrorWrapper(async(req, res, next) => {
+    const updated = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+        runValidators: true,
+        returnDocument: 'after'
+    })
 
-module.exports.deleteBootcamp = asyncErrorWrapper(async(req, res, next) => {});
+    if(!updated){
+        return next(new AppError(`could not find resource with id ${req.params.id}`))
+    }
+
+    return res.status(200).json({
+        success: true,
+        data: {
+            updated
+        }
+    })
+});
+
+module.exports.deleteBootcamp = asyncErrorWrapper(async(req, res, next) => {
+    const deleted = await Bootcamp.findByIdAndDelete(req.params.id, {
+        runValidators: true,
+        new: true
+    })
+
+    if(!deleted){
+        return next(new AppError(`could not find resource with id ${req.params.id}`))
+    }
+
+    return res.status(204).json({
+        success: true,
+    })
+});
 
 
