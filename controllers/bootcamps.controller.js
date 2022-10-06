@@ -7,7 +7,7 @@ module.exports.getBootcamps = asyncErrorWrapper(async (req, res, next) => {
 
     res.status(200).json({
         success: true,
-        result: bootcamps.length,
+        count: bootcamps.length,
         data: {
             bootcamps
         }
