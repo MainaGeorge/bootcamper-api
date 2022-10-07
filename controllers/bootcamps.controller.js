@@ -4,7 +4,44 @@ const asyncErrorWrapper = require('../utils/async.error.wrapper');
 const colors = require('colors');
 
 module.exports.getBootcamps = asyncErrorWrapper(async (req, res, next) => {
-    const bootcamps = await Bootcamp.find();
+    
+    const reqQuery = { ...req.query }
+    const fieldsToExcludeInQueryObject = ['select', 'sort', 'limit', 'page']
+
+    fieldsToExcludeInQueryObject.forEach(f => delete reqQuery[f]);
+
+    let filter = JSON.stringify(reqQuery).replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`)
+
+    filter = JSON.parse(filter);
+    console.log(colors.green(filter));
+
+    let query = Bootcamp.find();
+
+    if (req.query.select) {
+        const fields = req.query.select.split(',').join(' ');
+        query = query.select(fields);
+    }
+
+    if (req.query.sort) {
+        const sortBy = req.query.sort.split(',').join(' ');
+        query = query.sort(sortBy)
+    } else {
+        query = query.sort('-name');
+    }
+
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.page, 10) || 10;
+    const startIndex = (page - 1) * limit;
+    const endIndex = limit * page;
+    const total = await Bootcamp.countDocuments();
+    const pagination = {}
+
+    if (endIndex < total) pagination.next = page + 1
+    if (startIndex > 0) pagination.prev = page - 1;
+
+    query = query.skip(startIndex).limit(limit);
+
+    const bootcamps = await query.find(filter);
 
     res.status(200).json({
         success: true,
