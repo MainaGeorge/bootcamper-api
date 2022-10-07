@@ -18,7 +18,7 @@ app.use(errorMiddleware);
 
 const server = app.listen(port, async () => {
     await connectDb();
-    console.log(colors.brightYellow.bold(`server running on port ${port} in ${process.env.NODE_ENV}`));
+    console.log(colors.brightYellow.bold(`server running on port ${port} in ${port}`));
 });
 
 process.on('unhandledRejection', (err) => {

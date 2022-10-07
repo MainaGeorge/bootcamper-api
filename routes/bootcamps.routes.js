@@ -1,5 +1,14 @@
 const router = require('express').Router();
-const {getBootcamps, getBootcamp, updateBootcamp, deleteBootcamp, createBootcamp} = require('../controllers/bootcamps.controller')
+const {
+  getBootcamps,
+  getBootcamp,
+  updateBootcamp,
+  deleteBootcamp,
+  createBootcamp,
+  findBootcampWithinDistance,
+} = require("../controllers/bootcamps.controller");
+
+router.get('/lat/:lat/long/:long/distance/:distance/unit/:unit',findBootcampWithinDistance);
 
 router
     .route('/')
