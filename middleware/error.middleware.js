@@ -2,9 +2,9 @@ const colors = require('colors');
 const ApiError = require('../utils/custom.error')
 
 module.exports = function (err, req, res, next) {
-    console.log(colors.red(err));
-    let error = { ...err }
-    
+    // console.log(colors.red(err));
+    let error = Object.assign(err, {})
+
     if (err.name === "ValidationError") {
         const errObj = err.errors;
         const message = Object.keys(errObj).map(e => errObj[e].message)

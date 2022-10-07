@@ -41,7 +41,7 @@ module.exports.updateBootcamp = asyncErrorWrapper(async(req, res, next) => {
     })
 
     if(!updated){
-        return next(new AppError(`could not find resource with id ${req.params.id}`))
+        return next(new AppError(`could not find resource with id ${req.params.id}`, 400))
     }
 
     return res.status(200).json({
@@ -59,7 +59,7 @@ module.exports.deleteBootcamp = asyncErrorWrapper(async(req, res, next) => {
     })
 
     if(!deleted){
-        return next(new AppError(`could not find resource with id ${req.params.id}`))
+        return next(new AppError(`could not find resource with id ${req.params.id}`, 400))
     }
 
     return res.status(204).json({
