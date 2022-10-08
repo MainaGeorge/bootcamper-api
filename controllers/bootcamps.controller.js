@@ -4,16 +4,12 @@ const asyncErrorWrapper = require('../utils/async.error.wrapper');
 const colors = require('colors');
 
 module.exports.getBootcamps = asyncErrorWrapper(async (req, res, next) => {
-    
     const reqQuery = { ...req.query }
     const fieldsToExcludeInQueryObject = ['select', 'sort', 'limit', 'page']
 
     fieldsToExcludeInQueryObject.forEach(f => delete reqQuery[f]);
 
-    let filter = JSON.stringify(reqQuery).replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`)
-
-    filter = JSON.parse(filter);
-    console.log(colors.green(filter));
+    const filter = JSON.parse(JSON.stringify(reqQuery).replace(/\b(gt|gte|lt|lte|in)\b/g, match => `$${match}`));
 
     let query = Bootcamp.find();
 
@@ -114,7 +110,6 @@ module.exports.findBootcampWithinDistance = asyncErrorWrapper(async (req, res, n
     const { distance, lat, long, unit } = req.params;
     const radius = unit === 'mi' ? +distance * 0.62137 / 3963: +distance/6378;
 
-    console.log(colors.green(distance, radius))
     const bootcamps = await Bootcamp.find({
         location:
         {
