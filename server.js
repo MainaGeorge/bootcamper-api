@@ -5,6 +5,7 @@ const devenv = require('dotenv').config({
 });
 const colors = require('colors');
 const bootcampRouter = require('./routes/bootcamps.routes');
+const courseRouter = require('./routes/courses.routes');
 const connectDb = require('./dbConnection');
 const errorMiddleware = require('./middleware/error.middleware')
 
@@ -14,11 +15,12 @@ const app = express();
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(`${process.env.API_VERSION}/bootcamps`, bootcampRouter);
+app.use(`${process.env.API_VERSION}/courses`, courseRouter);
 app.use(errorMiddleware);
 
 const server = app.listen(port, async () => {
     await connectDb();
-    console.log(colors.brightYellow.bold(`server running on port ${port} in ${port}`));
+    console.log(colors.yellow.bold(`server running on port ${port} in ${port}`));
 });
 
 process.on('unhandledRejection', (err) => {

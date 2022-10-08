@@ -37,7 +37,7 @@ module.exports.getBootcamps = asyncErrorWrapper(async (req, res, next) => {
 
     query = query.skip(startIndex).limit(limit);
 
-    const bootcamps = await query.find(filter);
+    const bootcamps = await query.find(filter).populate('courses');
 
     res.status(200).json({
         success: true,
@@ -87,7 +87,7 @@ module.exports.updateBootcamp = asyncErrorWrapper(async(req, res, next) => {
 });
 
 module.exports.deleteBootcamp = asyncErrorWrapper(async(req, res, next) => {
-    const deleted = await Bootcamp.findByIdAndDelete(req.params.id, {
+    const deleted = await Bootcamp.findById(req.params.id, {
         runValidators: true,
         new: true
     })
@@ -95,6 +95,8 @@ module.exports.deleteBootcamp = asyncErrorWrapper(async(req, res, next) => {
     if(!deleted){
         return next(new AppError(`could not find resource with id ${req.params.id}`, 400))
     }
+
+    deleted.remove();
 
     return res.status(204).json({
         success: true,
