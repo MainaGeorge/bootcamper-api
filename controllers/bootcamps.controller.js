@@ -1,7 +1,6 @@
 const Bootcamp = require('../models/bootcamp.model');
 const AppError = require('../utils/custom.error');
 const asyncErrorWrapper = require('../utils/async.error.wrapper');
-const colors = require('colors');
 
 module.exports.getBootcamps = asyncErrorWrapper(async (req, res, next) => {
     const reqQuery = { ...req.query }
@@ -25,8 +24,9 @@ module.exports.getBootcamps = asyncErrorWrapper(async (req, res, next) => {
         query = query.sort('-name');
     }
 
-    const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.page, 10) || 10;
+    let {page, limit} = req.query;
+    page = parseInt(page, 10) || 1;
+    limit = parseInt(limit, 10) || 10;
     const startIndex = (page - 1) * limit;
     const endIndex = limit * page;
     const total = await Bootcamp.countDocuments();
@@ -65,7 +65,7 @@ module.exports.getBootcamp = asyncErrorWrapper(async (req, res, next) => {
 
 module.exports.createBootcamp = asyncErrorWrapper(async (req, res, next) => {
     const bootcamp = await Bootcamp.create(req.body);
-    res.status(201).json({ success: true, data: bootcamp });
+    res.status(201).json({ success: true, data:{data: bootcamp}  });
 });
 
 module.exports.updateBootcamp = asyncErrorWrapper(async(req, res, next) => {
@@ -81,7 +81,7 @@ module.exports.updateBootcamp = asyncErrorWrapper(async(req, res, next) => {
     return res.status(200).json({
         success: true,
         data: {
-            updated
+            data: updated
         }
     })
 });
@@ -101,14 +101,14 @@ module.exports.deleteBootcamp = asyncErrorWrapper(async(req, res, next) => {
     return res.status(204).json({
         success: true,
         data: {
-            deleted
+            data: deleted
         }
     })
 });
 
 module.exports.findBootcampWithinDistance = asyncErrorWrapper(async (req, res, next) => {
     // unit=mi or km --> default km radius;
-    // the radians should be in radians, hence the division by 3963 for miles and 6378 for km
+    // the radians should be in radians using the radius of the earth as the ref, hence the division by 3963 for miles and 6378 for km
     const { distance, lat, long, unit } = req.params;
     const radius = unit === 'mi' ? +distance * 0.62137 / 3963: +distance/6378;
 
