@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const Bootcamp = require('./bootcamp.model');
+const schema = require('./base.schema')
 const colors = require('colors')
 
-const CourseSchema = new mongoose.Schema({
+const courseSchema = {
     title: {
         type: String,
         required: [true, 'please provide a title for your course'],
@@ -31,26 +32,8 @@ const CourseSchema = new mongoose.Schema({
         ref: 'Bootcamp',
         required: true
     }
-}, {
-    toJSON: {
-        virtuals: true,
-        transform: function (doc, ret) {
-            ret.id = ret._id;
-            delete ret.__v;
-            delete ret._id;
-            return ret;
-        }
-    },
-    toObject: {
-        virtuals: true,
-        transform: function (doc, ret) {
-            ret.id = ret._id;
-            delete ret.__v;
-            delete ret._id;
-            return ret;
-        }
-    },
-});
+}
+const CourseSchema = schema(courseSchema);
 
 CourseSchema.statics.calculateAverageCourseCostInBootcamp = async function (bootcampId) {
     const avgResult = await this.aggregate([
