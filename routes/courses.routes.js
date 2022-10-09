@@ -1,8 +1,13 @@
 const router = require('express').Router({mergeParams: true});
+const shaperMiddleware = require('../middleware/res.shaper.middleware');
+const Course = require('../models/course.model')
 const {getCourses, getCourse, updateCourse, deleteCourse, createCourse} = require('../controllers/courses.controller');
 
 router.route('/')
-    .get(getCourses)
+    .get(shaperMiddleware(Course, {
+        path: 'bootcamp',
+        select: 'name averageCost'
+    }), getCourses)
     .post(createCourse);
 
 router.route('/:id')

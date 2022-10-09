@@ -4,19 +4,28 @@ const Course = require('../models/course.model');
 const Bootcamp = require('../models/bootcamp.model');
 
 module.exports.getCourses = asyncErrorWrapper(async (req, res, next) => {
-    let query = Course.find();
     const {bootCampId} = req.params;
 
-    if(bootCampId) query = query.find({bootcamp: bootCampId});
+    if(bootCampId) {
+        let courses = await Course.find({bootcamp: bootCampId}).populate({
+            path: 'bootcamp',
+            select: 'name averageCost'
+        })
+        return res.status(200).json({
+            success: true,
+            count: courses.length,
+            data: {
+                data: courses
+            }
+        })
+    }
 
-    const courses = await query;
     return res.status(200).json({
         success: true,
-        count: courses.length,
-        data: {
-            data: courses
-        }
+        data: res.shapedData
     })
+
+
 });
 
 module.exports.getCourse = asyncErrorWrapper(async function(req, res, next){

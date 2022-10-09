@@ -1,39 +1,10 @@
 const mongoose = require('mongoose');
 const Bootcamp = require('./bootcamp.model');
-const schema = require('./base.schema')
-const colors = require('colors')
+const baseSchema = require('./base.schema');
+const colors = require('colors');
+const courseSchema = require('./course.schema.design');
 
-const courseSchema = {
-    title: {
-        type: String,
-        required: [true, 'please provide a title for your course'],
-        maxlength: [50, 'title can not be more than 50 characters'],
-        trim: true
-    },
-    description: {
-        type: String,
-        required: ['true', 'please provide a description for your course'],
-    },
-    weeks: {
-        type: String,
-        required: [true, 'please provide the duration of the course in weeks']
-    },
-    tuition: {
-        type: Number,
-        required: [true, 'please provide the amount of tuition fee payable for the course']
-    },
-    minimumSkill: {
-        type: String,
-        enum: ['beginner', 'intermediate', 'advanced'],
-        required: [true, 'please provide a the minimum skill required']
-    },
-    bootcamp: {
-        type: mongoose.Schema.ObjectId,
-        ref: 'Bootcamp',
-        required: true
-    }
-}
-const CourseSchema = schema(courseSchema);
+const CourseSchema = baseSchema(courseSchema);
 
 CourseSchema.statics.calculateAverageCourseCostInBootcamp = async function (bootcampId) {
     const avgResult = await this.aggregate([

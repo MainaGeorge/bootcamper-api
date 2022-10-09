@@ -1,5 +1,8 @@
 const router = require('express').Router();
 const courseRouter = require('./courses.routes');
+const Bootcamp = require('../models/bootcamp.model');
+const shaperMiddleware = require('../middleware/res.shaper.middleware');
+
 const {
   getBootcamps,
   getBootcamp,
@@ -14,7 +17,10 @@ router.get('/lat/:lat/long/:long/distance/:distance/unit/:unit',findBootcampWith
 
 router
     .route('/')
-    .get(getBootcamps)
+    .get(shaperMiddleware(Bootcamp, {
+      path: 'courses',
+      select: 'title tuition weeks'
+    }), getBootcamps)
     .post(createBootcamp);
 
 router
