@@ -49,7 +49,10 @@ module.exports.getBootcamps = asyncErrorWrapper(async (req, res, next) => {
 });
 
 module.exports.getBootcamp = asyncErrorWrapper(async (req, res, next) => {
-    const bootcamp = await Bootcamp.findById(req.params.id);
+    const bootcamp = await Bootcamp.findById(req.params.id).populate({
+        path: 'courses',
+        select: 'title tuition'
+    });
 
     if(!bootcamp){
         return next(new AppError(`Could not find resource with the id ${req.params.id}`, 400));

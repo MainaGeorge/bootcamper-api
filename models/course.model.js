@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const Bootcamp = require('./bootcamp.model');
+const colors = require('colors')
 
 const CourseSchema = new mongoose.Schema({
     title: {
@@ -47,6 +49,30 @@ const CourseSchema = new mongoose.Schema({
             delete ret._id;
             return ret;
         }
-    },});
+    },
+});
+
+CourseSchema.statics.calculateAverageCourseCostInBootcamp = async function (bootcampId) {
+    const avgResult = await this.aggregate([
+        {$match: {bootcamp: bootcampId}},
+        {$group: {_id: '$bootcamp', averageCost: {$avg: '$tuition'}}}
+    ]);
+    try{
+        await Bootcamp.findByIdAndUpdate(bootcampId, {
+            averageCost: Math.ceil(avgResult[0].averageCost / 10) * 10
+        })
+
+    }catch(err){
+        console.log(err)
+    }
+}
+
+CourseSchema.post('save', async function(){
+    await this.constructor.calculateAverageCourseCostInBootcamp(this.bootcamp._id);
+})
+
+CourseSchema.post('remove', async function(){
+    await this.constructor.calculateAverageCourseCostInBootcamp(this.bootcamp);
+})
 
 module.exports = mongoose.model('Course', CourseSchema)

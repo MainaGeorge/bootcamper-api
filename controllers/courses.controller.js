@@ -1,6 +1,7 @@
 const asyncErrorWrapper = require('../utils/async.error.wrapper');
 const AppError = require('../utils/custom.error');
 const Course = require('../models/course.model');
+const Bootcamp = require('../models/bootcamp.model');
 
 module.exports.getCourses = asyncErrorWrapper(async (req, res, next) => {
     let query = Course.find();
@@ -58,6 +59,12 @@ module.exports.deleteCourse = asyncErrorWrapper(async function(req, res, next){
 })
 
 module.exports.createCourse = asyncErrorWrapper(async function(req, res, next){
+    const {bootCampId} = req.params;
+    const bootcamp = await Bootcamp.findById(bootCampId);
+
+    if(!bootcamp) return next(new AppError(`No bootcamp found with the id ${req.params.id}`, 400));
+    req.body.bootcamp = bootcamp;
+
     const course = await Course.create(req.body);
     res.status(201).json({ success: true, data: {data: course }});
 })
