@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 module.exports = schema => new mongoose.Schema(schema, {
+    timestamps: true,
     toJSON: {
         virtuals: true,
         transform: function (doc, ret) {

@@ -6,6 +6,7 @@ const devenv = require('dotenv').config({
 const colors = require('colors');
 const bootcampRouter = require('./routes/bootcamps.routes');
 const courseRouter = require('./routes/courses.routes');
+const userRouter = require('./routes/users.route');
 const connectDb = require('./dbConnection');
 const errorMiddleware = require('./middleware/error.middleware')
 
@@ -16,6 +17,7 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.use(`${process.env.API_VERSION}/bootcamps`, bootcampRouter);
 app.use(`${process.env.API_VERSION}/courses`, courseRouter);
+app.use(`${process.env.API_VERSION}/users`, userRouter);
 app.use(errorMiddleware);
 
 const server = app.listen(port, async () => {

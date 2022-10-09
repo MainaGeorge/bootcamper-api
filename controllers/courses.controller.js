@@ -46,6 +46,7 @@ module.exports.updateCourse = asyncErrorWrapper(async function(req, res, next){
         runValidators: true
     });
 
+    if(!course) return next(new AppError(`No course found with the id ${req.params.id}`, 400));
     return res.status(200).json({
         success: true,
         data: {
