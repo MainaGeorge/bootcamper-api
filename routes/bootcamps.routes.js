@@ -2,7 +2,7 @@ const router = require('express').Router();
 const courseRouter = require('./courses.routes');
 const Bootcamp = require('../models/bootcamp.model');
 const shaperMiddleware = require('../middleware/res.shaper.middleware');
-
+const {protect, restrictToRole} = require('../controllers/auth.controller');
 const {
   getBootcamps,
   getBootcamp,
@@ -21,12 +21,12 @@ router
       path: 'courses',
       select: 'title tuition weeks'
     }), getBootcamps)
-    .post(createBootcamp);
+    .post(protect, restrictToRole('admin', 'publisher'), createBootcamp);
 
 router
     .route('/:id')
     .get(getBootcamp)
-    .delete(deleteBootcamp)
-    .patch(updateBootcamp);
+    .delete(protect, restrictToRole('admin', 'publisher'), deleteBootcamp)
+    .patch(protect, restrictToRole('admin', 'publisher'), updateBootcamp);
 
 module.exports = router;

@@ -1,7 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-const devenv = require('dotenv').config({
+require('dotenv').config({
     path: './.env'
 });
 const colors = require('colors');
@@ -16,6 +16,7 @@ const app = express();
 
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(cookieParser());
 app.use(`${process.env.API_VERSION}/bootcamps`, bootcampRouter);
 app.use(`${process.env.API_VERSION}/courses`, courseRouter);
 app.use(`${process.env.API_VERSION}/users`, userRouter);

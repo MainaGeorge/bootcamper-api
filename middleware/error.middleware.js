@@ -12,7 +12,6 @@ module.exports = function (err, req, res, next) {
     } else if(err.name === "CastError"){
         error = new ApiError(`the id ${err.value} can not be casted into a valid mongo ObjectId`, 400)
     } else if(err.code === 11000){
-        console.log(colors.green(err))
         const message = `the field [ ${Object.keys(err.keyValue).join(' ')} ] is not allowed to be duplicate`;
         error = new ApiError(message, 400)
     }

@@ -31,6 +31,7 @@ module.exports = (modelToQuery, populateObject) => async (req, res, next) => {
     if (endIndex < total) pagination.nextPage = page + 1
     if (startIndex > 0) pagination.previousPage = page - 1;
     pagination.currentPage = page;
+    pagination.count = total
 
     query = query.skip(startIndex).limit(limit);
 
@@ -38,7 +39,6 @@ module.exports = (modelToQuery, populateObject) => async (req, res, next) => {
 
     res.shapedData = {
         pagination,
-        count: total,
         data: results
     }
     next();

@@ -38,7 +38,7 @@ BootcampSchema.pre('remove', async function(next){
 BootcampSchema.virtual('courses', {
     ref: 'Course',
     localField: '_id',
-    foreignField: 'bootcamp'
+    foreignField: 'bootcamp',
 });
 
 module.exports = mongoose.model('Bootcamp', BootcampSchema);
