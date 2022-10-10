@@ -3,7 +3,7 @@ module.exports = {
         type: String,
         required: [true, 'please add an email'],
         unique: [true, 'email already exists'],
-        match: /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/,
+        match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'please provide a valid email'],
         trim: true
     },
     name: {

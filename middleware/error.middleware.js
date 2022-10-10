@@ -2,7 +2,7 @@ const colors = require('colors');
 const ApiError = require('../utils/custom.error')
 
 module.exports = function (err, req, res, next) {
-    // console.log(colors.red(err));
+    console.log(colors.red(err));
     let error = Object.assign(err, {})
 
     if (err.name === "ValidationError") {
@@ -12,7 +12,8 @@ module.exports = function (err, req, res, next) {
     } else if(err.name === "CastError"){
         error = new ApiError(`the id ${err.value} can not be casted into a valid mongo ObjectId`, 400)
     } else if(err.code === 11000){
-        const message = `the field [ ${err.keyValue.name} ] is not allowed to be duplicate`;
+        console.log(colors.green(err))
+        const message = `the field [ ${Object.keys(err.keyValue).join(' ')} ] is not allowed to be duplicate`;
         error = new ApiError(message, 400)
     }
       

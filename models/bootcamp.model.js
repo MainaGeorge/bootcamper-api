@@ -14,6 +14,7 @@ BootcampSchema.pre('save', function (next) {
 BootcampSchema.pre('save', async function (next) {
     if (!this.address) return next();
     const geocodedDataResponse = await geocode(this.address);
+    if(!geocodedDataResponse || !Array.isArray(geocodedDataResponse.data)) return next();
     const geoCoded = geocodedDataResponse.data[0]
     this.location = {
         type: 'Point',
