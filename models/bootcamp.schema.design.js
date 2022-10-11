@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 module.exports = {
     name: {
         type: String,
@@ -84,4 +85,9 @@ module.exports = {
         type: Date,
         default: Date.now,
     },
+    user: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+        required: true
+    }
 }

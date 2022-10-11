@@ -6,7 +6,7 @@ const Bootcamp = require('../models/bootcamp.model');
 module.exports.getCourses = asyncErrorWrapper(async (req, res, next) => {
     const {bootCampId} = req.params;
 
-    if(bootCampId) {
+    if (bootCampId) {
         let courses = await Course.find({bootcamp: bootCampId}).populate({
             path: 'bootcamp',
             select: 'name averageCost'
@@ -24,13 +24,11 @@ module.exports.getCourses = asyncErrorWrapper(async (req, res, next) => {
         success: true,
         data: res.shapedData
     })
-
-
 });
 
-module.exports.getCourse = asyncErrorWrapper(async function(req, res, next){
+module.exports.getCourse = asyncErrorWrapper(async function (req, res, next) {
     const course = await Course.findById(req.params.id);
-    if(!course) return next(new AppError(`No course found with the id ${req.params.id}`, 400));
+    if (!course) return next(new AppError(`No course found with the id ${req.params.id}`, 400));
 
     return res.status(200).json({
         success: true,
@@ -40,13 +38,19 @@ module.exports.getCourse = asyncErrorWrapper(async function(req, res, next){
     })
 })
 
-module.exports.updateCourse = asyncErrorWrapper(async function(req, res, next){
-    const course = await Course.findByIdAndUpdate(req.params.id, req.body, {
+module.exports.updateCourse = asyncErrorWrapper(async function (req, res, next) {
+    let course = await Course.findById(req.params.id);
+    const userId = req.user.id
+
+    if (!course) return next(new AppError(`No course found with the id ${req.params.id}`, 400));
+
+    if(course.user !== userId && req.user.role !== 'admin'){
+        return next(new AppError(`user ${userId} is not allowed to update resource ${req.params.id}`, 403));
+    }
+    course = await Course.findByIdAndUpdate(req.params.id, req.body, {
         new: true,
         runValidators: true
-    });
-
-    if(!course) return next(new AppError(`No course found with the id ${req.params.id}`, 400));
+    })
     return res.status(200).json({
         success: true,
         data: {
@@ -55,10 +59,14 @@ module.exports.updateCourse = asyncErrorWrapper(async function(req, res, next){
     })
 })
 
-module.exports.deleteCourse = asyncErrorWrapper(async function(req, res, next){
+module.exports.deleteCourse = asyncErrorWrapper(async function (req, res, next) {
+    const userId = req.user.id
     const course = await Course.findById(req.params.id);
-    if(!course) return next(new AppError(`No course found with the id ${req.params.id}`, 400));
+    if (!course) return next(new AppError(`No course found with the id ${req.params.id}`, 400));
 
+    if(course.user !== userId && req.user.role !== 'admin'){
+        return next(new AppError(`user ${userId} is not allowed to update resource ${req.params.id}`, 403));
+    }
     course.remove();
     return res.status(204).json({
         success: true,
@@ -68,13 +76,17 @@ module.exports.deleteCourse = asyncErrorWrapper(async function(req, res, next){
     })
 })
 
-module.exports.createCourse = asyncErrorWrapper(async function(req, res, next){
+module.exports.createCourse = asyncErrorWrapper(async function (req, res, next) {
     const {bootCampId} = req.params;
     const bootcamp = await Bootcamp.findById(bootCampId);
+    const userId = req.user.id;
 
-    if(!bootcamp) return next(new AppError(`No bootcamp found with the id ${req.params.id}`, 400));
+    if (!bootcamp) return next(new AppError(`No bootcamp found with the id ${req.params.id}`, 400));
+    if(bootcamp.user !== userId && req.user.role !== 'admin'){
+        return next(new AppError(`user ${userId} is not allowed to create resources in this bootcamp`, 403));
+    }
+
     req.body.bootcamp = bootcamp;
-
     const course = await Course.create(req.body);
-    res.status(201).json({ success: true, data: {data: course }});
+    res.status(201).json({success: true, data: {data: course}});
 })
