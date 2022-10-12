@@ -4,6 +4,7 @@ const User = require('../models/user.model');
 const jwt = require('jsonwebtoken');
 const util = require('util');
 const colors = require('colors');
+const crypto = require('crypto');
 
 const sendTokenResponse = (user, statusCode, res) => {
     const token = user.createSignInToken();
@@ -66,3 +67,32 @@ module.exports.restrictToRole = (...roles) => (req, res, next) => {
     if(!roles.includes(req.user.role)) return next(new AppError(`the role [ ${req.user.role} ] not authorized to perform that action on this resource`, 403));
     next();
 }
+
+module.exports.forgotPassword = asyncErrorWrapper(async(req, res, next) => {
+    const user = await User.findOne({email: req.body.email});
+    if(!user) return next(new AppError(`No user with that email exists in our database`, 400));
+    const resetToken = await user.getResetPasswordToken();
+
+    return res.status(200).json({
+        success: true,
+        data: {
+            resetToken
+        }
+    })
+});
+
+module.exports.resetPassword = asyncErrorWrapper(async(req, res, next) => {
+    const resetToken = req.params.resetToken;
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    const user = await User.findOne({resetPasswordToken: hashedToken, resetPasswordExpire: {$gt: new Date().toISOString()}});
+
+    if(!user) return next(new AppError(`The token is expired. Please get another one`, 400))
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save();
+    sendTokenResponse(user, 200, res);
+});
+
