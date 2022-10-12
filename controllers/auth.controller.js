@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const util = require('util');
 const colors = require('colors');
 const crypto = require('crypto');
+const sendEmail = require('../utils/email')
 
 const sendTokenResponse = (user, statusCode, res) => {
     const token = user.createSignInToken();
@@ -71,20 +72,35 @@ module.exports.restrictToRole = (...roles) => (req, res, next) => {
 module.exports.forgotPassword = asyncErrorWrapper(async(req, res, next) => {
     const user = await User.findOne({email: req.body.email});
     if(!user) return next(new AppError(`No user with that email exists in our database`, 400));
-    const resetToken = await user.getResetPasswordToken();
 
-    return res.status(200).json({
-        success: true,
-        data: {
-            resetToken
-        }
-    })
+    const resetToken = await user.getResetPasswordToken();
+    const resetUrl = `${req.protocol}://${req.get('host')}${process.env.API_VERSION}/auth/reset-password/${resetToken}`;
+
+    const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
+
+    try {
+        await sendEmail({
+            email: user.email,
+            subject: 'Password reset token',
+            message
+        });
+        res.status(200).json({ success: true, data: 'Email sent' });
+    }
+    catch (err) {
+        console.log(err);
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpire = undefined;
+
+        await user.save({ validateBeforeSave: false });
+
+        return next(new AppError('Email could not be sent', 500));
+    }
 });
 
 module.exports.resetPassword = asyncErrorWrapper(async(req, res, next) => {
     const resetToken = req.params.resetToken;
     const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-
+    console.log(colors.green(hashedToken))
     const user = await User.findOne({resetPasswordToken: hashedToken, resetPasswordExpire: {$gt: new Date().toISOString()}});
 
     if(!user) return next(new AppError(`The token is expired. Please get another one`, 400))
