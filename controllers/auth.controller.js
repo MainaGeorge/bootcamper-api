@@ -112,3 +112,15 @@ module.exports.resetPassword = asyncErrorWrapper(async(req, res, next) => {
     sendTokenResponse(user, 200, res);
 });
 
+module.exports.updatePassword = asyncErrorWrapper(async (req, res, next) => {
+    const {password, newPassword } = req.body;
+    let user = await User.findById(req.user.id).select('+password');
+
+    if(!user) return next(new AppError(`user not found`, 404));
+    if(!(await user.comparePasswords(password))) return next(new AppError(`incorrect password, please try again`, 400))
+
+    user.password = newPassword;
+    user = await user.save();
+    return sendTokenResponse(user, 200, res);
+})
+

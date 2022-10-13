@@ -18,8 +18,8 @@ router.get('/lat/:lat/long/:long/distance/:distance/unit/:unit',findBootcampWith
 router
     .route('/')
     .get(shaperMiddleware(Bootcamp, {
-      path: 'courses',
-      select: 'title tuition weeks'
+      path: 'user',
+      select: 'name'
     }), getBootcamps)
     .post(protect, restrictToRole('admin', 'publisher'), createBootcamp);
 

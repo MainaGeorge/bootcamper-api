@@ -8,6 +8,7 @@ const colors = require('colors');
 const bootcampRouter = require('./routes/bootcamps.routes');
 const courseRouter = require('./routes/courses.routes');
 const userRouter = require('./routes/auth.route');
+const adminRouter = require('./routes/admin.route')
 const connectDb = require('./dbConnection');
 const errorMiddleware = require('./middleware/error.middleware')
 
@@ -20,6 +21,7 @@ app.use(cookieParser());
 app.use(`${process.env.API_VERSION}/bootcamps`, bootcampRouter);
 app.use(`${process.env.API_VERSION}/courses`, courseRouter);
 app.use(`${process.env.API_VERSION}/auth`, userRouter);
+app.use(`${process.env.API_VERSION}/users`, adminRouter);
 app.use(errorMiddleware);
 
 const server = app.listen(port, async () => {

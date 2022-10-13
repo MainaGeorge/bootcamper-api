@@ -32,10 +32,11 @@ module.exports = (modelToQuery, populateObject) => async (req, res, next) => {
     if (startIndex > 0) pagination.previousPage = page - 1;
     pagination.currentPage = page;
     pagination.count = total
+    pagination.pageSize = limit;
 
     query = query.skip(startIndex).limit(limit);
 
-    const results = await query.find(filter).populate(populateObject);
+    const results = populateObject ? await query.find(filter).populate(populateObject) : await query.find(filter);
 
     res.shapedData = {
         pagination,
