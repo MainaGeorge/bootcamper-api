@@ -2,7 +2,6 @@ const Review = require('../models/reviews.model');
 const asyncErrorWrapper = require('../utils/async.error.wrapper');
 const AppError = require('../utils/custom.error');
 const Bootcamp = require("../models/bootcamp.model");
-const User = require('../models/user.model')
 
 module.exports.getReviews = asyncErrorWrapper(async (req, res, next) => {
     const {bootCampId} = req.params;

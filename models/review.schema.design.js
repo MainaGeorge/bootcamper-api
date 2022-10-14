@@ -9,7 +9,7 @@ module.exports = {
     text: {
         type: String,
         required: [true, 'please provide some description or text for your review'],
-        maxlength: [1000, 'the text or description of a review can not exceed 1000 characters']
+        maxlength: [1000, 'the text of a review can not exceed 1000 characters']
     },
     user: {
         type: mongoose.Schema.ObjectId,
@@ -25,6 +25,6 @@ module.exports = {
         type: Number,
         max: 10,
         min: 1,
-        required: [true, 'a review must contain a rating']
+        required: [true, 'a review must contain a rating between 1 and 10']
     }
 }
