@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const courseRouter = require('./courses.routes');
+const reviewRouter = require('./reviews.routes')
 const Bootcamp = require('../models/bootcamp.model');
 const shaperMiddleware = require('../middleware/res.shaper.middleware');
 const {protect, restrictToRole} = require('../controllers/auth.controller');
@@ -13,6 +14,7 @@ const {
 } = require("../controllers/bootcamps.controller");
 
 router.use('/:bootCampId/courses', courseRouter);
+router.use('/:bootCampId/reviews', reviewRouter)
 router.get('/lat/:lat/long/:long/distance/:distance/unit/:unit',findBootcampWithinDistance);
 
 router

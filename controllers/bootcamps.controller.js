@@ -44,7 +44,7 @@ module.exports.updateBootcamp = asyncErrorWrapper(async (req, res, next) => {
     let updated = await Bootcamp.findById(req.params.id)
 
     if (!updated) {
-        return next(new AppError(`could not find resource with id ${req.params.id}`, 400))
+        return next(new AppError(`could not find resource with id ${req.params.id}`, 404))
     }
 
     if (req.user.id !== bootcamp.user.toString() && req.user.role !== 'admin') {
